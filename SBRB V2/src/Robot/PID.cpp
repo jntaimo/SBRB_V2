@@ -2,10 +2,10 @@
 #include "PID.h"
 
 //motor controller pins
-#define DIR1 2
-#define PWM1 3
-#define DIR2 4
-#define PWM2 5 
+#define DIR1 13
+#define PWM1 12
+#define DIR2 11
+#define PWM2 10
 
 // ================================================================
 // ===               MOTOR CONTROLLER SETUP               ===
