@@ -22,6 +22,7 @@ uint32_t button_mask = (1 << BUTTON_RIGHT) | (1 << BUTTON_DOWN) |
 
 bool readJoystick();
 void printJoyXYText();
+void drawJoyXYCircle(uint8_t radius);
 //Joystick tracking variables
 int last_x = 0, last_y = 0;
 bool rightPressed = false;
@@ -53,14 +54,21 @@ void setup(void){
 
 }
 
+
+void loop(){
+    //print the new reading to display if we get it 
+    if (readJoystick()){
+        drawJoyXYCircle(6);
+    }
+    
+}
+
 uint16_t tft_x = 0;
 uint16_t tft_y = 0;
 uint16_t last_tft_x = 0;
 uint16_t last_tft_y = 0;
-uint8_t radius = 5;
-void loop(){
-    //print the new reading to display if we get it 
-    if (readJoystick()){
+//draws a circle representing the position of the joystick
+void drawJoyXYCircle(uint8_t radius){
         tft_x = map(last_y, 0, 1023, 0, TFT_WIDTH/3);
         tft_y = map(last_x, 0, 1023, 0, TFT_HEIGHT);
         //remove the previous circle
@@ -70,8 +78,6 @@ void loop(){
         //store the last circle
         last_tft_x = tft_x;
         last_tft_y = tft_y;
-    }
-    
 }
 //prints the text of the X Y position on the screen
 void printJoyXYText(){
