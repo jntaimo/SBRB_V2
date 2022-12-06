@@ -26,7 +26,7 @@ void motorSetup(){
 // ================================================================
 
 //Defines the balancing angle from vertical in degrees
-float trim_val = -.75;//-1.0;
+float trim_val = -1.0;//-1.0;
 //Adjusts relative power to each motor to make it drive straight
 float bal_val = 1.0;
 
