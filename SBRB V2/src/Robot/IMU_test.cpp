@@ -33,7 +33,9 @@ uint16_t BNO055_SAMPLERATE_DELAY_MS = 10;
 // Check I2C device address and correct line below (by default address is 0x29 or 0x28)
 //                                   id, address
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28, &Wire);
-void printEvent(sensors_event_t* event);
+void storeData(sensors_event_t* event);
+void printData();
+void readIMU();
 
 void setup(void)
 {
@@ -53,40 +55,48 @@ void setup(void)
 
   delay(1000);
 }
-
+float roll, pitch, yaw, rollRate, pitchRate, yawRate;
 void loop(void)
 {
-  //could add VECTOR_ACCELEROMETER, VECTOR_MAGNETOMETER,VECTOR_GRAVITY...
-  sensors_event_t orientationData , angVelocityData , linearAccelData, magnetometerData, accelerometerData, gravityData;
-  bno.getEvent(&orientationData, Adafruit_BNO055::VECTOR_EULER);
-  bno.getEvent(&angVelocityData, Adafruit_BNO055::VECTOR_GYROSCOPE);
-  printEvent(&orientationData);
-  printEvent(&angVelocityData);
-
+  readIMU();
+  printData();
   delay(BNO055_SAMPLERATE_DELAY_MS);
 }
-
-void printEvent(sensors_event_t* event) {
+void readIMU(){
+    sensors_event_t orientationData , angVelocityData;
+    bno.getEvent(&orientationData, Adafruit_BNO055::VECTOR_EULER);
+    bno.getEvent(&angVelocityData, Adafruit_BNO055::VECTOR_GYROSCOPE);
+    storeData(&orientationData);
+    storeData(&angVelocityData);
+}
+void storeData(sensors_event_t* event) {
   double x = -1000000, y = -1000000 , z = -1000000; //dumb values, easy to spot problem
-
   if (event->type == SENSOR_TYPE_ORIENTATION) {
-    Serial.print("Orient:");
-    x = event->orientation.x;
-    y = event->orientation.y;
-    z = event->orientation.z;
+    yaw = event->orientation.x;
+    pitch = event->orientation.y;
+    roll = event->orientation.z;
   }
   else if (event->type == SENSOR_TYPE_GYROSCOPE) {
-    Serial.print("Gyro:");
-    x = event->gyro.x;
-    y = event->gyro.y;
-    z = event->gyro.z;
+    yawRate = event->gyro.x;
+    pitchRate = event->gyro.y;
+    rollRate = event->gyro.z;
   }
+}
 
+void printData(){
+  Serial.print("Orient:"); 
+  Serial.print("\ty= ");
+  Serial.print(yaw);
+  Serial.print(" |\tp= ");
+  Serial.print(pitch);
+  Serial.print(" |\tr= ");
+  Serial.println(roll);    
 
-  Serial.print("\tx= ");
-  Serial.print(x);
-  Serial.print(" |\ty= ");
-  Serial.print(y);
-  Serial.print(" |\tz= ");
-  Serial.println(z);
+  Serial.print("Gyro:");
+  Serial.print("\tyr= ");
+  Serial.print(yawRate);
+  Serial.print(" |\tpr= ");
+  Serial.print(pitchRate);
+  Serial.print(" |\trr= ");
+  Serial.println(rollRate);  
 }
