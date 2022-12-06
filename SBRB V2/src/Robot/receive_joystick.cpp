@@ -40,23 +40,20 @@ typedef struct struct_message {
 struct_message joyData;
 
 esp_now_peer_info_t peerInfo;
-// callback when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-
-    bool success = status == ESP_NOW_SEND_SUCCESS ;
-    
-    if (success){
-        BG_COLOR = ST77XX_GREEN;
-    } else {
-        BG_COLOR = ST77XX_RED;
-    }     
-
-}
-
+//Function Prototypes
 bool readJoystick();
 void printJoyXYText();
 void drawJoyXYCircle(uint16_t joyX, uint16_t joyY, uint8_t radius);
 void sendJoystick();
+
+// callback when data is sent
+// callback function that will be executed when data is received
+void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+  memcpy(&joyData, incomingData, sizeof(joyData));
+  drawJoyXYCircle(joyData.joyX, joyData.joyY, 6);
+}
+
+
 //Joystick tracking variables
 int last_x = 0, last_y = 0;
 bool rightPressed = false;
@@ -76,20 +73,9 @@ void setup(void){
     return;
   }
 
-  // Once ESPNow is successfully Init, we will register for Send CB to
-  // get the status of Trasnmitted packet
-  esp_now_register_send_cb(OnDataSent);
-  
-  // Register peer
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-  peerInfo.channel = 0;  
-  peerInfo.encrypt = false;
-  
-  // Add peer        
-  if (esp_now_add_peer(&peerInfo) != ESP_OK){
-    Serial.println("Failed to add peer");
-    return;
-  }
+  // Once ESPNow is successfully Init, we will register for recv CB to
+  // get recv packer info
+  esp_now_register_recv_cb(OnDataRecv);
   // ESP-NOW Setup Complete
 
     //////Initialize TFT Display
@@ -119,29 +105,10 @@ long lastSendData = 0;
 
 void loop(){
     //print the new reading to display if we get it 
-    if (readJoystick()){
-        drawJoyXYCircle(last_x, last_y, 6);
-        sendJoystick();
-    }
-    // //send data every set amount of time
-    // if (millis()-lastSendData > sendDataDelay){       
-    //     lastSendData = millis();
-    // }
+    
+    
 }
 
-void sendJoystick(){
-    // Set values to send
-  joyData.joyX = last_x;
-  joyData.joyY = last_y;
-  joyData.rightPressed = rightPressed;
-  joyData.downPressed = downPressed;
-  joyData.leftPressed = leftPressed;
-  joyData.upPressed = upPressed;
-  joyData.selPressed = selPressed;
-  
-  // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &joyData, sizeof(joyData));
-}
 uint16_t tft_x = 0;
 uint16_t tft_y = 0;
 uint16_t last_tft_x = 0;
