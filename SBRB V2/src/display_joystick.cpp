@@ -4,7 +4,9 @@
 #include <SPI.h>
 //TFT Display setup
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
-
+#define TFT_WIDTH 240
+#define TFT_HEIGHT 135
+#define BG_COLOR ST77XX_BLACK
 //Joystick setup
 #include "Adafruit_seesaw.h"
 
@@ -51,12 +53,23 @@ void setup(void){
 
 }
 
-
+uint16_t tft_x = 0;
+uint16_t tft_y = 0;
+uint16_t last_tft_x = 0;
+uint16_t last_tft_y = 0;
+uint8_t radius = 5;
 void loop(){
-    //print the new reading to display if we get it
+    //print the new reading to display if we get it 
     if (readJoystick()){
-        printJoyXYText();
-        
+        tft_x = map(last_y, 0, 1023, 0, TFT_WIDTH/3);
+        tft_y = map(last_x, 0, 1023, 0, TFT_HEIGHT);
+        //remove the previous circle
+        tft.fillCircle(last_tft_x, last_tft_y, radius , BG_COLOR);
+        //plot the latest
+        tft.fillCircle(tft_x, tft_y, radius, ST77XX_BLUE);
+        //store the last circle
+        last_tft_x = tft_x;
+        last_tft_y = tft_y;
     }
     
 }
