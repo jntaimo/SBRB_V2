@@ -19,6 +19,7 @@ uint32_t button_mask = (1 << BUTTON_RIGHT) | (1 << BUTTON_DOWN) |
                 (1 << BUTTON_LEFT) | (1 << BUTTON_UP) | (1 << BUTTON_SEL);
 
 bool readJoystick();
+void printJoyXYText();
 //Joystick tracking variables
 int last_x = 0, last_y = 0;
 bool rightPressed = false;
@@ -54,6 +55,13 @@ void setup(void){
 void loop(){
     //print the new reading to display if we get it
     if (readJoystick()){
+        printJoyXYText();
+        
+    }
+    
+}
+//prints the text of the X Y position on the screen
+void printJoyXYText(){
         //empty section of screen
         tft.fillRect(0,0,120,60, ST77XX_BLACK);
         //Configure text       
@@ -70,11 +78,7 @@ void loop(){
         tft.printf("Y:%d", last_y);
         tft.println();
         //print button readings
-        
-    }
-    
 }
-
 
 //Reads the current joystick values and updates the tracking variables
 //Returns true if the values have changed
