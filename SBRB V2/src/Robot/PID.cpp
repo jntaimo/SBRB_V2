@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "PID.h"
-
+#include "wireless.h"
 //motor controller pins
 #define DIR1 13
 #define PWM1 12
@@ -26,7 +26,7 @@ void motorSetup(){
 // ================================================================
 
 //Defines the balancing angle from vertical in degrees
-float trim_val = -1.0;//-1.0;
+float trim_val = -4.0;//-1.0;
 //Adjusts relative power to each motor to make it drive straight
 float bal_val = 1.0;
 
@@ -42,9 +42,9 @@ float Pcontrol = 0.0, Icontrol = 0.0, Dcontrol = 0.0;
 float pwm = 0.0, pwm_L, pwm_R;
 float set_point = 0.0;
 
-float kp =13;//5;
-float ki =60;//30;
-float kd = .2;//0.5;
+float kp =13;
+float ki =60;
+float kd = .2;
 
 // ================================================================
 // ===      0                INITIAL SETUP                       ===
@@ -75,15 +75,19 @@ void updatePID(){
 
 //Get the setpoint based on the input mode
 void getSetpoint(){
-
+  //get the current joystick Y value
+  float maxAngle = 3; 
+  set_point = mapFloat(getY(), 0, 1023, -maxAngle, maxAngle);
+  bal_val = mapFloat(getX(), 0, 1023, 0.5,1.5);
 }
+
 
 //sends the correct pwm value to the motors
 //assumes the pwm is from -255 to 255
 void motorPWM(int pwm_L, int pwm_R){
 
-  pwm_L = constrain(pwm_L, -MAX_PWM, MAX_PWM);
-  pwm_R = constrain(pwm_R, -MAX_PWM, MAX_PWM);
+  pwm_L = constrain(pwm_L*bal_val, -MAX_PWM, MAX_PWM);
+  pwm_R = constrain(pwm_R*(2-bal_val), -MAX_PWM, MAX_PWM);
     
     //assign motor direction
     digitalWrite(DIR1, pwm_L > 0);
@@ -96,7 +100,7 @@ void motorPWM(int pwm_L, int pwm_R){
     if (pwm_R > -DEADBAND__PWM && pwm_R < 0) pwm_L = -0;
   
   //TODO Stop motors if tilt angles exceed 15 degrees
-  if (abs(pitch) >= 20) {
+  if (abs(pitch) >= 15) {
     pwm_L = 0.0;
     pwm_R = 0.0;
   }
@@ -118,6 +122,7 @@ void runPID(float gyroYaw, float gyroPitch, float gyroPitchRate) {
   
   pitch = gyroPitch;
   pitchRate = gyroPitchRate;
+  getSetpoint();
   updateController();
   updatePID();
 
@@ -135,4 +140,8 @@ void runPID(float gyroYaw, float gyroPitch, float gyroPitchRate) {
     Serial.println(sum_error);    
   }
     motorPWM(-pwm, pwm);  
+}
+float mapFloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }

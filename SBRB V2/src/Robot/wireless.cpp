@@ -46,7 +46,7 @@ bool readJoystick();
 void printJoyXYText();
 void drawJoyXYCircle(uint16_t joyX, uint16_t joyY, uint8_t radius);
 void sendJoystick();
-
+float getY();
 // callback when data is sent
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
@@ -165,4 +165,10 @@ bool readJoystick(){
         newReading = true;
     }
     return newReading;
+}
+float getY(){
+  return joyData.joyY;
+}
+float getX(){
+  return joyData.joyX;
 }
