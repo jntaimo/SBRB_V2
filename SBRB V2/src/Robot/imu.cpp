@@ -49,12 +49,3 @@ imu::Vector<3> gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
   
   pitchRate = gyro.z();
 }
-
-void setup(){
-  imuSetup();
-}
-
-void loop(){
-  imuLoop();
-  delay(10);
-}
