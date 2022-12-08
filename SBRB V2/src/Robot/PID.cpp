@@ -7,6 +7,7 @@
 #define DIR2 11
 #define PWM2 10
 
+#define TRIM_PIN A0
 // ================================================================
 // ===               MOTOR CONTROLLER SETUP               ===
 // ================================================================
@@ -20,6 +21,10 @@ void motorSetup(){
   pinMode(DIR2, OUTPUT);
   pinMode(PWM1, OUTPUT);
   pinMode(PWM2, OUTPUT);
+   //setup balance pin
+  pinMode(TRIM_PIN, INPUT);
+  pinMode(A1, OUTPUT);
+  digitalWrite(A1, LOW);
 }
 // ================================================================
 // ===                 Potentiometer Setup                      ===
@@ -78,7 +83,8 @@ void getSetpoint(){
   //get the current joystick Y value
   float maxAngle = 3; 
   set_point = mapFloat(getY(), 0, 1023, -maxAngle, maxAngle);
-  bal_val = 1.0;//mapFloat(getX(), 0, 1023, 0.5,1.5);
+  bal_val = mapFloat(getX(), 0, 1023, 0.5,1.5);
+  trim_val  = mapFloat(analogRead(TRIM_PIN), 0, 1023, -3, 3);
 }
 
 
