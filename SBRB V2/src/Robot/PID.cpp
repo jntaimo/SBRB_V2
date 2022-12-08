@@ -26,7 +26,7 @@ void motorSetup(){
 // ================================================================
 
 //Defines the balancing angle from vertical in degrees
-float trim_val = -4.0;//-1.0;
+float trim_val = -0.75;//-1.0;
 //Adjusts relative power to each motor to make it drive straight
 float bal_val = 1.0;
 
@@ -42,8 +42,8 @@ float Pcontrol = 0.0, Icontrol = 0.0, Dcontrol = 0.0;
 float pwm = 0.0, pwm_L, pwm_R;
 float set_point = 0.0;
 
-float kp =13;
-float ki =60;
+float kp = 13;
+float ki = 60;
 float kd = .2;
 
 // ================================================================
@@ -78,7 +78,7 @@ void getSetpoint(){
   //get the current joystick Y value
   float maxAngle = 3; 
   set_point = mapFloat(getY(), 0, 1023, -maxAngle, maxAngle);
-  bal_val = mapFloat(getX(), 0, 1023, 0.5,1.5);
+  bal_val = 1.0;//mapFloat(getX(), 0, 1023, 0.5,1.5);
 }
 
 
@@ -103,6 +103,8 @@ void motorPWM(int pwm_L, int pwm_R){
   if (abs(pitch) >= 15) {
     pwm_L = 0.0;
     pwm_R = 0.0;
+    //reset integral
+    sum_error = 0;
   }
 
     analogWrite(PWM1, abs(pwm_L));
