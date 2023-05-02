@@ -97,8 +97,9 @@ void wirelessSetup(void){
     ss.begin(0x49);
     ss.pinModeBulk(button_mask, INPUT_PULLUP);
     ss.setGPIOInterrupts(button_mask, 1);    
-
-
+   //default the joystick values
+    joyData.joyX = 512;
+    joyData.joyY = 512;
 }
 
 long sendDataDelay = 100; //Millis

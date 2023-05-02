@@ -47,9 +47,9 @@ float Pcontrol = 0.0, Icontrol = 0.0, Dcontrol = 0.0;
 float pwm = 0.0, pwm_L, pwm_R;
 float set_point = 0.0;
 
-float kp = 13;
-float ki = 60;
-float kd = .2;
+float kp = 10;
+float ki = 40;
+float kd = 2;
 
 // ================================================================
 // ===      0                INITIAL SETUP                       ===
@@ -84,7 +84,7 @@ void getSetpoint(){
   float maxAngle = 3; 
   set_point = mapFloat(getY(), 0, 1023, -maxAngle, maxAngle);
   bal_val = mapFloat(getX(), 0, 1023, 0.5,1.5);
-  trim_val  = mapFloat(analogRead(TRIM_PIN), 0, 1023, -3, 3);
+  trim_val  = -3.4; //mapFloat(analogRead(TRIM_PIN), 0, 4095, -9, 3);
 }
 
 
@@ -138,14 +138,15 @@ void runPID(float gyroYaw, float gyroPitch, float gyroPitchRate) {
 
   if (millis() > prevPrintTime + printDelay){
     prevPrintTime = millis();
-    Serial.print("P\t");
-    Serial.println(Pcontrol);
-    Serial.print("\tI\t");
-    Serial.print(Icontrol);
-    Serial.print("\tD\t");
-    Serial.print(Dcontrol);
-    Serial.print("\tSumError\t");
-    Serial.println(sum_error);    
+    // Serial.print("P\t");
+    // Serial.println(Pcontrol);
+    // Serial.print("\tI\t");
+    // Serial.print(Icontrol);
+    // Serial.print("\tD\t");
+    // Serial.print(Dcontrol);
+    // Serial.print("\tSumError\t");
+    // Serial.println(sum_error);    
+    Serial.println(trim_val);
   }
     motorPWM(-pwm, pwm);  
 }
